@@ -1,0 +1,115 @@
+<body>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      font-family: Roboto;
+    }
+    .muted {
+      opacity: 0.5;
+    }
+    .btn {
+      background: steelblue;
+      border-radius: 6px;
+      color: white;
+      font-weight: Roboto;
+      border: none;
+      font-weight: 500;
+      padding: 0.5em 1em;
+    }
+  </style>
+
+  <h1>TODO List</h1>
+
+  <todo-items></todo-items>
+</body>
+
+<script src="/index.js"></script>
+
+<script>
+
+const store = El.observable({
+  items: [
+    { id: key(), title: "buy milk" },
+    { id: key(), title: "buy eggs" },
+    { id: key(), title: "buy coffee" },
+  ],
+});
+
+class TodoItem extends El {
+  editItem() {
+    const title = window.prompt("Enter title", this.item.title);
+    if (title !== null) this.item.title = title;
+  }
+  toggleDone() {
+    this.item.done = !this.item.done;
+  }
+  css() {
+    return `
+      :host {
+        display: table-row;
+        &(:hover) {
+          color: blue;
+          background-color: #f3f5f8;
+        }
+      }
+      span {
+        display: table-cell;
+        padding: 1em;
+      }
+    `
+  }
+  render(tmpl) {
+    return tmpl`
+      <span><input type="checkbox" ${this.item.done && 'checked'} onclick=${this.toggleDone}></span>
+      <span class="muted">${this.item.id}</span>
+      <span ref="title">
+        <h3>${this.item.title}</h3>
+      </span>
+      <span><button class="btn" onclick=${this.editItem}>Edit</button></span>
+      <span>${this.item.done && tmpl` <div class="badge">DONE!</div> `}</span>
+    `
+  }
+}
+
+class TodoItems extends El {
+  created() {
+    this.$watch(store.items.length, () => console.log("WATCHER"));
+  }
+  addItem() {
+    const title = window.prompt("Enter title");
+    store.items.push({
+      id: key(),
+      title
+    });
+  }
+  css() {
+    return `
+      div {
+        display: table;
+        border: 1px solid grey;
+      }
+    `;
+  }
+  render(tmpl) {
+    return tmpl`
+      <h1>Items</h1>
+      <button onclick=${this.addItem}>Add item</button>
+      <div class="items">
+        ${console.log("INS", typeof tmpl.each)}
+        ${tmpl.each(store.items, item => tmpl`
+          <todo-item item=${item}></todo-item>
+        `)}
+      </div>
+    `
+  }
+}
+
+customElements.define('todo-item', TodoItem);
+customElements.define('todo-items', TodoItems);
+
+function key() {
+  return Math.random().toString(36).slice(2)
+}
+</script>
