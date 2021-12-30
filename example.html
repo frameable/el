@@ -1,22 +1,44 @@
 <body>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
       font-family: Roboto;
     }
+    h2,h3,h4,h5,h6 {
+      margin: 0;
+    }
+    .flex {
+      display: flex;
+    }
+    .items-center {
+      align-items: center;
+    }
     .muted {
       opacity: 0.5;
     }
     .btn {
-      background: steelblue;
-      border-radius: 6px;
-      color: white;
-      font-weight: Roboto;
+      background: gainsboro;
       border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: Roboto;
       font-weight: 500;
       padding: 0.5em 1em;
+      transition: filter 0.2s;
+    }
+    .btn:hover {
+      filter: brightness(90%) contrast(120%);
+    }
+    .btn.primary {
+      background: royalblue;
+      color: white;
+    }
+    .badge {
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 0.2em 0.8em;
+      background: #ccc;
     }
   </style>
 
@@ -45,38 +67,72 @@ class TodoItem extends El {
   toggleDone() {
     this.item.done = !this.item.done;
   }
+  deleteItem() {
+    const index = store.items.findIndex(i => i.id == this.item.id);
+    store.items.splice(index, 1);
+  }
+  render(tmpl) {
+    return tmpl`
+      <span class="status-column">
+        ${this.item.done
+          ? tmpl`<span class="badge success">Done!</span>`
+          : tmpl`<span class="badge">New</span>`
+        }
+      </span>
+      <span>
+        <input
+          type="checkbox"
+          ${this.item.done && 'checked'}
+          onclick=${this.toggleDone}>
+      </span>
+      <span class="muted">${this.item.id}</span>
+      <span ref="title">
+        <h3>${this.item.title}</h3>
+      </span>
+      <span>
+        <button class="btn" onclick=${this.editItem}>
+          Edit
+        </button>
+        <button class="btn delete muted" onclick=${this.deleteItem}>
+          &times;
+        </button>
+      </span>
+    `
+  }
   css() {
     return `
       :host {
         display: table-row;
         &(:hover) {
-          color: blue;
-          background-color: #f3f5f8;
+          background-color: #8ff4;
         }
       }
       span {
         display: table-cell;
         padding: 1em;
       }
-    `
-  }
-  render(tmpl) {
-    return tmpl`
-      <span><input type="checkbox" ${this.item.done && 'checked'} onclick=${this.toggleDone}></span>
-      <span class="muted">${this.item.id}</span>
-      <span ref="title">
-        <h3>${this.item.title}</h3>
-      </span>
-      <span><button class="btn" onclick=${this.editItem}>Edit</button></span>
-      <span>${this.item.done && tmpl` <div class="badge">DONE!</div> `}</span>
+      .btn.delete {
+        background: transparent;
+        box-shadow: 0 0 0 1px #1234;
+        margin-left: 2px;
+      }
+      .btn.delete:hover {
+        background: crimson;
+        color: white;
+        box-shadow: none;
+      }
+      .badge.success {
+        background: mediumseagreen;
+        color: white;
+      }
+      .status-column {
+        min-width: 3em;
+      }
     `
   }
 }
 
 class TodoItems extends El {
-  created() {
-    this.$watch(store.items.length, () => console.log("WATCHER"));
-  }
   addItem() {
     const title = window.prompt("Enter title");
     store.items.push({
@@ -86,21 +142,39 @@ class TodoItems extends El {
   }
   css() {
     return `
-      div {
+      .items-container {
         display: table;
-        border: 1px solid grey;
+      }
+      header {
+        background: whitesmoke;
+        box-shadow: 0 1px 1px #1232;
+        padding: 16px;
+        > *:first-child {
+          margin-right: auto;
+        }
+        .badge {
+          margin-left: 4px;
+        }
       }
     `;
   }
   render(tmpl) {
     return tmpl`
-      <h1>Items</h1>
-      <button onclick=${this.addItem}>Add item</button>
-      <div class="items">
-        ${console.log("INS", typeof tmpl.each)}
-        ${tmpl.each(store.items, item => tmpl`
-          <todo-item item=${item}></todo-item>
-        `)}
+      <div class="items-container">
+        <header class="flex items-center">
+          <h4 class="flex items-center">
+            Items
+            <span class="badge">
+              ${store.items.length}
+            </span>
+          </h4>
+          <button class="btn primary" onclick=${this.addItem}>Add item</button>
+        </header>
+        <div class="items">
+          ${tmpl.each(store.items, item => tmpl`
+            <todo-item item=${item}></todo-item>
+          `)}
+        </div>
       </div>
     `
   }
