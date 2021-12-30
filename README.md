@@ -1,4 +1,4 @@
-# El Framework
+# El
 
 Minimal JavaScript application framework inspired by React and Vue
 
