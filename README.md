@@ -8,24 +8,30 @@ El is based on WebComponents, and provides a friendly interface to these feature
 
 - Built-in observable store
 - Reactive templates with one-way binding
-- Watch expressions
+- Fast differential DOM updates
 - Scoped CSS via shadow DOM
-- Preprocessed CSS to support SCSS subset implicit nesting and ampersands
+- Preprocessing to support SCSS subset: implicit nesting and ampersands
+- Watch expressions
 - Component lifecycle methods
-- Just ~140 lines of source code (~1.4kb gzipped)
+- Just ~150 lines of source code (~1.7kb gzipped)
 - Minimal surface area with easy learning curve
-- No need for build tools like webpack or rollup
+- No dependencies on any other libraries
+- No need for build tools like Webpack or Rollup
 
 ```html
 <my-counter></my-counter>
 
 <script>
-  const store = El.observable({ count: 0 });
-
   class MyCounter extends El {
-    render(tmpl) {
-      return tmpl`
-        <span>Count: ${store.count}</span>
+    created() {
+      this.state = this.$observable({ count: 0 });
+    }
+    increment() {
+      this.state.count += 1;
+    }
+    render(html) {
+      return html`
+        <span>Count: ${this.state.count}</span>
         <button onclick=${this.increment}>Increment</button>
       `
     }
@@ -38,7 +44,6 @@ El is based on WebComponents, and provides a friendly interface to these feature
 
 El serves as a base class for custom elements / WebComponents.  Inherit from `El` and then register with `customElements.define`:
 
-
 ```html
 <my-element></my-element>
 
@@ -50,9 +55,9 @@ El serves as a base class for custom elements / WebComponents.  Inherit from `El
 </script>
 ```
 
-If you are new to custom elements, some tips:
+If you are new to custom elements, some tips per the spec:
 
-- element tag names are lowercase with at least one hyphen
+- element tag names must be lowercase with at least one hyphen
 - `customElements` takes the given class and registers with the tag name
 - in the markup, custom elements cannot be self-closing
 
@@ -84,12 +89,12 @@ class TodoItems extends El {
 
 ### Templates
 
-Templates are rendered through the `render` function, which accepts a `tmpl` tag function.  Element attributes like class names and event handlers can be assigned expressions directly.
+Templates are rendered through the `render` function, which accepts a `html` tag function.  Element attributes like class names and event handlers can be assigned expressions directly.
 
 ```javascript
 class TodoItem extends El {
-  render(tmpl) {
-    return tmpl`
+  render(html) {
+    return html`
       <div class="title ${this.done && 'title--done'">
         ${this.title}
       </div>
@@ -101,15 +106,15 @@ class TodoItem extends El {
 
 #### Looping
 
-Iterate through items with `tmpl.each`:
+Iterate through items with `map`, and make sure to add a unique `key` attribute:
 
 ```javascript
 class TodoItems extends El {
-  render(tmpl) {
-    return tmpl`
+  render(html) {
+    return html`
       <div class="todo-items">
-        ${tmpl.each(this.items, item => tmpl`
-          <todo-item item=${item}></todo-item>
+        ${this.items.map, item => html`
+          <todo-item item=${item} key=${item.id}></todo-item>
         `}
       </div>
     `;
@@ -123,14 +128,14 @@ Within a render function, you can use short-circuit (`&&`) or ternary syntax (`c
 
 ```javascript
 class TodoItem extends El {
-  render(tmpl) {
-    return tmpl`
+  render(html) {
+    return html`
       <div class="title ${this.done && 'title--done'">
         ${this.title}
       </div>
       ${this.editable
-        ? tmpl`<button onclick=${this.edit}>Edit</button>`
-        : tmpl`<span>Archived</span>
+        ? html`<button onclick=${this.edit}>Edit</button>`
+        : html`<span>Archived</span>
       `}
     `;
   }
@@ -158,8 +163,8 @@ class TodoItem extends El {
       }
     `
   }
-  render(tmpl) {
-    return tmpl`
+  render(html) {
+    return html`
       <div class="item">
         <div class="title ${this.done && 'title--done'">
           ${this.title}

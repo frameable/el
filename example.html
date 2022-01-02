@@ -3,6 +3,7 @@
   <style>
     :root {
       font-family: Roboto;
+      margin-top: 16px;
     }
     h2,h3,h4,h5,h6 {
       margin: 0;
@@ -13,12 +14,16 @@
     .items-center {
       align-items: center;
     }
+    .items-end {
+      align-items: flex-end;
+    }
     .muted {
       opacity: 0.5;
     }
     .btn {
       background: gainsboro;
       border: none;
+      border-bottom: 1px solid #1221;
       border-radius: 4px;
       cursor: pointer;
       font-family: Roboto;
@@ -27,7 +32,7 @@
       transition: filter 0.2s;
     }
     .btn:hover {
-      filter: brightness(90%) contrast(120%);
+      filter: brightness(85%) contrast(133%);
     }
     .btn.primary {
       background: royalblue;
@@ -40,11 +45,18 @@
       padding: 0.2em 0.8em;
       background: #ccc;
     }
+    .ml-4 {
+      margin-left: 4px;
+    }
+    .mr-4 {
+      margin-right: 4px;
+    }
   </style>
 
-  <h1>TODO List</h1>
+  <h1>Todo list</h1>
 
   <todo-items></todo-items>
+  <div id="elstash"></div>
 </body>
 
 <script src="/index.js"></script>
@@ -54,8 +66,8 @@
 const store = El.observable({
   items: [
     { id: key(), title: "buy milk" },
+    { id: key(), title: "buy bread" },
     { id: key(), title: "buy eggs" },
-    { id: key(), title: "buy coffee" },
   ],
 });
 
@@ -71,12 +83,12 @@ class TodoItem extends El {
     const index = store.items.findIndex(i => i.id == this.item.id);
     store.items.splice(index, 1);
   }
-  render(tmpl) {
-    return tmpl`
+  render(html) {
+    return html`
       <span class="status-column">
         ${this.item.done
-          ? tmpl`<span class="badge success">Done!</span>`
-          : tmpl`<span class="badge">New</span>`
+          ? `<span class="badge success">Done!</span>`
+          : `<span class="badge">New</span>`
         }
       </span>
       <span>
@@ -85,17 +97,13 @@ class TodoItem extends El {
           ${this.item.done && 'checked'}
           onclick=${this.toggleDone}>
       </span>
-      <span class="muted">${this.item.id}</span>
-      <span ref="title">
+      <span><p class="muted">${this.item.id}</p></span>
+      <span class="title ${this.item.done && 'title--completed'}">
         <h3>${this.item.title}</h3>
       </span>
       <span>
-        <button class="btn" onclick=${this.editItem}>
-          Edit
-        </button>
-        <button class="btn delete muted" onclick=${this.deleteItem}>
-          &times;
-        </button>
+        <button class="btn" onclick=${this.editItem}>Edit</button>
+        <button class="btn delete muted" onclick=${this.deleteItem}>&times;</button>
       </span>
     `
   }
@@ -106,10 +114,11 @@ class TodoItem extends El {
         &(:hover) {
           background-color: #8ff4;
         }
-      }
-      span {
-        display: table-cell;
-        padding: 1em;
+        > span {
+          display: table-cell;
+          padding: 1em;
+          border-bottom: 1px solid #2232;
+        }
       }
       .btn.delete {
         background: transparent;
@@ -128,6 +137,10 @@ class TodoItem extends El {
       .status-column {
         min-width: 3em;
       }
+      .title--completed {
+        opacity: 0.5;
+        text-decoration: line-through;
+      }
     `
   }
 }
@@ -140,6 +153,35 @@ class TodoItems extends El {
       title
     });
   }
+  toggleHideCompleted(e) {
+    store.hideCompleted = e.target.checked;
+  }
+  filteredItems() {
+    return store.items.filter(i => store.hideCompleted ? !i.done : true);
+  }
+  render(html) {
+    const items = this.filteredItems();
+    return html`
+      <div class="items-container">
+        <header class="flex items-center">
+          <h4 class="flex items-center">
+            Items
+            <span class="badge ml-4 mr-4">${items.length}</span>
+          </h4>
+          <span class="ml-4 flex items-end">
+            <input type="checkbox" onclick=${this.toggleHideCompleted}>
+            <small class="muted">Hide completed</small>
+          </span>
+          <button class="btn primary" onclick=${this.addItem}>Add item</button>
+        </header>
+        <div class="items">
+          ${items.map(item => html`
+            <todo-item key="${item.id}" item=${item}></todo-item>
+          `)}
+        </div>
+      </div>
+    `
+  }
   css() {
     return `
       .items-container {
@@ -149,34 +191,11 @@ class TodoItems extends El {
         background: whitesmoke;
         box-shadow: 0 1px 1px #1232;
         padding: 16px;
-        > *:first-child {
-          margin-right: auto;
-        }
-        .badge {
-          margin-left: 4px;
+        > *:last-child {
+          margin-left: auto;
         }
       }
     `;
-  }
-  render(tmpl) {
-    return tmpl`
-      <div class="items-container">
-        <header class="flex items-center">
-          <h4 class="flex items-center">
-            Items
-            <span class="badge">
-              ${store.items.length}
-            </span>
-          </h4>
-          <button class="btn primary" onclick=${this.addItem}>Add item</button>
-        </header>
-        <div class="items">
-          ${tmpl.each(store.items, item => tmpl`
-            <todo-item item=${item}></todo-item>
-          `)}
-        </div>
-      </div>
-    `
   }
 }
 
