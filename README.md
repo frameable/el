@@ -40,7 +40,7 @@ El is based on WebComponents, and provides a friendly interface to these feature
 </script>
 ```
 
-### Components
+## Components
 
 El serves as a base class for custom elements / WebComponents.  Inherit from `El` and then register with `customElements.define`:
 
@@ -69,7 +69,7 @@ If lifecycle methods are defined on the component, they will fire at the appropr
 - `mounted()` - component has been attached to the DOM
 - `unmounted()` - component has been removed from the DOM
 
-### Observable
+## Observable
 
 Use `El.observable` to create an observable store which will allow components to update when the store changes.  El keeps track of which components depend on which parts of the store, and only performs the necessary updates.
 
@@ -87,15 +87,15 @@ class TodoItems extends El {
 }
 ```
 
-### Templates
+## Templates
 
-Templates are rendered through the `render` function, which accepts a `html` tag function.  Element attributes like class names and event handlers can be assigned expressions directly.
+Templates are rendered through the `render` function, which accepts a `html` tag function.  Element attributes like class names and event handlers can be assigned expressions directly, or interpolated.
 
 ```javascript
 class TodoItem extends El {
   render(html) {
     return html`
-      <div class="title ${this.done && 'title--done'">
+      <div class="title ${this.done && 'title--done'}">
         ${this.title}
       </div>
       <button onclick=${this.edit}>Edit</button>
@@ -142,7 +142,7 @@ class TodoItem extends El {
 }
 ```
 
-### Style
+## Style
 
 Specify CSS via the `css` method. Styles are scoped so that they only apply to elements in this component.  Neither ancestors nor descendants of this component will be affected by these styles.The built-in preprocessor adds support for implicit nesting and ampersand selectors.
 
