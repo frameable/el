@@ -136,7 +136,7 @@ Within a render function, you can use short-circuit (`&&`) or ternary syntax (`c
 class TodoItem extends El {
   render(html) {
     return html`
-      <div class="title ${this.done && 'title--done'">
+      <div class="title ${this.done && 'title--done'}">
         ${this.title}
       </div>
       ${this.editable
@@ -162,11 +162,12 @@ class TodoItem extends El {
         margin: 16px;
         padding: 16px;
 
-        .title {
-          font-weight: 500;
-        }
         &:hover {
           background: whitesmoke;
+        }
+
+        .title {
+          font-weight: 500;
         }
       }
     `
@@ -177,7 +178,6 @@ class TodoItem extends El {
         <div class="title ${this.done && 'title--done'}">
           ${this.title}
         </div>
-        <button onclick=${this.edit}>Edit</button>
       </item>
     `
   }
@@ -187,8 +187,3 @@ class TodoItem extends El {
 > The shadow DOM provides scoped CSS so that styles defined within a component don't leak either up to parents or down to children.  By default, global styles will also not be applied within components, which is great when you're building abstract components to be used across projects, but a hinderance when you want different components within a single application to have consistent fonts, colors, spacing, etc.  El clones global styles and applies those styles to each component via `link` tag with a data URI, so components will be affected by application-wide stylesheets.
 
 > El runs a stack-based line-by-line source filter on CSS in order to implement nesting CSS and the ampersand selector, popularized by SCSS and other tools, now a W3C working draft [CSS Nesting](https://www.w3.org/TR/css-nesting-1/).
-
-
-
-
-
