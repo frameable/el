@@ -174,7 +174,7 @@ class TodoItem extends El {
   render(html) {
     return html`
       <div class="item">
-        <div class="title ${this.done && 'title--done'">
+        <div class="title ${this.done && 'title--done'}">
           ${this.title}
         </div>
         <button onclick=${this.edit}>Edit</button>
