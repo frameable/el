@@ -108,7 +108,7 @@ class TodoItem extends El {
 }
 ```
 
-> Component rendering templates are implemented using [tag functions](). When the `html` tag function comes across a value to be interpolated, if the value is a complex value like an array or object being passed as a property, or if the value is a function being assigned as an event handler, the tag function stashes the value and interpolates into the template a key that can be use later to refer to the original complex value.
+> Component rendering templates are implemented using [tag functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates). When the `html` tag function comes across a value to be interpolated, if the value is a complex value like an array or object being passed as a property, or if the value is a function being assigned as an event handler, the tag function stashes the value and interpolates into the template a key that can be use later to refer to the original complex value.
 
 #### Looping
 
