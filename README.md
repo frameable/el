@@ -79,6 +79,18 @@ Use `El.observable` to create an observable store which will allow components to
 const store = El.observable({ items: [] });
 ```
 
+A component may wish to have its own observable state:
+
+```javascript
+class TodoItem extends El {
+  created() {
+    this.state = this.$observable({
+      status: 'new'
+    });
+  }
+}
+```
+
 A component can also subscribe to changes with `$watch`.
 
 ```javascript
