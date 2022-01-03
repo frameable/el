@@ -1,10 +1,11 @@
 # El
 
-Minimal JavaScript application framework inspired by React and Vue
+Minimal JavaScript application framework inspired by React and Vue.  See a working todo list [example](https://dchester.github.io/el/example.html) and [source](https://github.com/dchester/el/blob/main/example.html)
+
 
 ### Introduction
 
-El is based on WebComponents, and provides a friendly interface to these features:
+El is based on [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components), and provides a friendly interface to these features:
 
 - Built-in observable store
 - Reactive templates with one-way binding
@@ -39,6 +40,7 @@ El is based on WebComponents, and provides a friendly interface to these feature
   customElements.define('my-counter', MyCounter);
 </script>
 ```
+
 
 ## Components
 
@@ -87,6 +89,8 @@ class TodoItems extends El {
 }
 ```
 
+> Observable stores are implemented as recursive [proxies](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy).  When a component is rendered, as properties are accessed from observable stores, El keeps track of which components are dependent on which properties.  When those properties later change, the components that depend on them are rendered again.
+
 ## Templates
 
 Templates are rendered through the `render` function, which accepts a `html` tag function.  Element attributes like class names and event handlers can be assigned expressions directly, or interpolated.
@@ -103,6 +107,8 @@ class TodoItem extends El {
   }
 }
 ```
+
+> Component rendering templates are implemented using [tag functions](). When the `html` tag function comes across a value to be interpolated, if the value is a complex value like an array or object being passed as a property, or if the value is a function being assigned as an event handler, the tag function stashes the value and interpolates into the template a key that can be use later to refer to the original complex value.
 
 #### Looping
 
@@ -142,6 +148,8 @@ class TodoItem extends El {
 }
 ```
 
+> Once a template is rendered to html, it then needs to find its way into the DOM.  El renders first to a [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment), then traverses the fragment and its corresponding component in the actual DOM, and selectively alters the real DOM only where the two structures diverge.
+
 ## Style
 
 Specify CSS via the `css` method. Styles are scoped so that they only apply to elements in this component.  Neither ancestors nor descendants of this component will be affected by these styles.The built-in preprocessor adds support for implicit nesting and ampersand selectors.
@@ -175,4 +183,12 @@ class TodoItem extends El {
   }
 }
 ```
+
+> The shadow DOM provides scoped CSS so that styles defined within a component don't leak either up to parents or down to children.  By default, global styles will also not be applied within components, which is great when you're building abstract components to be used across projects, but a hinderance when you want different components within a single application to have consistent fonts, colors, spacing, etc.  El clones global styles and applies those styles to each component via `link` tag with a data URI, so components will be affected by application-wide stylesheets.
+
+> El runs a stack-based line-by-line source filter on CSS in order to implement nesting CSS and the ampersand selector, popularized by SCSS and other tools, now a W3C working draft [CSS Nesting](https://www.w3.org/TR/css-nesting-1/).
+
+
+
+
 
