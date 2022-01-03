@@ -154,3 +154,5 @@ class El extends HTMLElement {
     return lines.join('\n')
   }
 }
+
+export default El;

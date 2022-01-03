@@ -58,150 +58,151 @@
   <todo-items></todo-items>
 </body>
 
-<script src="index.js"></script>
+<script type="module">
 
-<script>
+  import El from './index.js';
 
-const store = El.observable({
-  items: [
-    { id: key(), title: "buy milk" },
-    { id: key(), title: "buy bread" },
-    { id: key(), title: "buy eggs" },
-  ],
-});
+  const store = El.observable({
+    items: [
+      { id: key(), title: "buy milk" },
+      { id: key(), title: "buy bread" },
+      { id: key(), title: "buy eggs" },
+    ],
+  });
 
-class TodoItem extends El {
-  editItem() {
-    const title = window.prompt("Enter title", this.item.title);
-    if (title !== null) this.item.title = title;
-  }
-  toggleDone() {
-    this.item.done = !this.item.done;
-  }
-  deleteItem() {
-    const index = store.items.findIndex(i => i.id == this.item.id);
-    store.items.splice(index, 1);
-  }
-  render(html) {
-    return html`
-      <span class="status-column">
-        ${this.item.done
-          ? `<span class="badge success">Done!</span>`
-          : `<span class="badge">New</span>`
+  class TodoItem extends El {
+    editItem() {
+      const title = window.prompt("Enter title", this.item.title);
+      if (title !== null) this.item.title = title;
+    }
+    toggleDone() {
+      this.item.done = !this.item.done;
+    }
+    deleteItem() {
+      const index = store.items.findIndex(i => i.id == this.item.id);
+      store.items.splice(index, 1);
+    }
+    render(html) {
+      return html`
+        <span class="status-column">
+          ${this.item.done
+            ? `<span class="badge success">Done!</span>`
+            : `<span class="badge">New</span>`
+          }
+        </span>
+        <span>
+          <input
+            type="checkbox"
+            ${this.item.done && 'checked'}
+            onclick=${this.toggleDone}>
+        </span>
+        <span><p class="muted">${this.item.id}</p></span>
+        <span class="title ${this.item.done && 'title--completed'}">
+          <h3>${this.item.title}</h3>
+        </span>
+        <span>
+          <button class="btn" onclick=${this.editItem}>Edit</button>
+          <button class="btn delete muted" title="Delete item" onclick=${this.deleteItem}>&times;</button>
+        </span>
+      `
+    }
+    css() {
+      return `
+        :host {
+          display: table-row;
+          &(:hover) {
+            background-color: #8ff4;
+          }
+          > span {
+            display: table-cell;
+            padding: 1em;
+            border-bottom: 1px solid #2232;
+          }
         }
-      </span>
-      <span>
-        <input
-          type="checkbox"
-          ${this.item.done && 'checked'}
-          onclick=${this.toggleDone}>
-      </span>
-      <span><p class="muted">${this.item.id}</p></span>
-      <span class="title ${this.item.done && 'title--completed'}">
-        <h3>${this.item.title}</h3>
-      </span>
-      <span>
-        <button class="btn" onclick=${this.editItem}>Edit</button>
-        <button class="btn delete muted" onclick=${this.deleteItem}>&times;</button>
-      </span>
-    `
-  }
-  css() {
-    return `
-      :host {
-        display: table-row;
-        &(:hover) {
-          background-color: #8ff4;
+        .btn.delete {
+          background: transparent;
+          box-shadow: 0 0 0 1px #1234;
+          margin-left: 2px;
         }
-        > span {
-          display: table-cell;
-          padding: 1em;
-          border-bottom: 1px solid #2232;
+        .btn.delete:hover {
+          background: crimson;
+          color: white;
+          box-shadow: none;
         }
-      }
-      .btn.delete {
-        background: transparent;
-        box-shadow: 0 0 0 1px #1234;
-        margin-left: 2px;
-      }
-      .btn.delete:hover {
-        background: crimson;
-        color: white;
-        box-shadow: none;
-      }
-      .badge.success {
-        background: mediumseagreen;
-        color: white;
-      }
-      .status-column {
-        min-width: 3em;
-      }
-      .title--completed {
-        opacity: 0.5;
-        text-decoration: line-through;
-      }
-    `
+        .badge.success {
+          background: mediumseagreen;
+          color: white;
+        }
+        .status-column {
+          min-width: 3em;
+        }
+        .title--completed {
+          opacity: 0.5;
+          text-decoration: line-through;
+        }
+      `
+    }
   }
-}
 
-class TodoItems extends El {
-  addItem() {
-    const title = window.prompt("Enter title");
-    store.items.push({
-      id: key(),
-      title
-    });
-  }
-  toggleHideCompleted(e) {
-    store.hideCompleted = e.target.checked;
-  }
-  filteredItems() {
-    return store.items.filter(i => store.hideCompleted ? !i.done : true);
-  }
-  render(html) {
-    const items = this.filteredItems();
-    return html`
-      <div class="items-container">
-        <header class="flex items-center">
-          <h4 class="flex items-center">
-            Items
-            <span class="badge ml-4 mr-4">${items.length}</span>
-          </h4>
-          <span class="ml-4 flex items-end">
-            <input type="checkbox" onclick=${this.toggleHideCompleted}>
-            <small class="muted">Hide completed</small>
-          </span>
-          <button class="btn primary" onclick=${this.addItem}>Add item</button>
-        </header>
-        <div class="items">
-          ${items.map(item => html`
-            <todo-item key="${item.id}" item=${item}></todo-item>
-          `)}
+  class TodoItems extends El {
+    addItem() {
+      const title = window.prompt("Enter title");
+      store.items.push({
+        id: key(),
+        title
+      });
+    }
+    toggleHideCompleted(e) {
+      store.hideCompleted = e.target.checked;
+    }
+    filteredItems() {
+      return store.items.filter(i => store.hideCompleted ? !i.done : true);
+    }
+    render(html) {
+      const items = this.filteredItems();
+      return html`
+        <div class="items-container">
+          <header class="flex items-center">
+            <h4 class="flex items-center">
+              Items
+              <span class="badge ml-4 mr-4">${items.length}</span>
+            </h4>
+            <span class="ml-4 flex items-end">
+              <input type="checkbox" onclick=${this.toggleHideCompleted}>
+              <small class="muted">Hide completed</small>
+            </span>
+            <button class="btn primary" onclick=${this.addItem}>Add item</button>
+          </header>
+          <div class="items">
+            ${items.map(item => html`
+              <todo-item key="${item.id}" item=${item}></todo-item>
+            `)}
+          </div>
         </div>
-      </div>
-    `
-  }
-  css() {
-    return `
-      .items-container {
-        display: table;
-      }
-      header {
-        background: whitesmoke;
-        box-shadow: 0 1px 1px #1232;
-        padding: 16px;
-        > *:last-child {
-          margin-left: auto;
+      `
+    }
+    css() {
+      return `
+        .items-container {
+          display: table;
         }
-      }
-    `;
+        header {
+          background: whitesmoke;
+          box-shadow: 0 1px 1px #1232;
+          padding: 16px;
+          > *:last-child {
+            margin-left: auto;
+          }
+        }
+      `;
+    }
   }
-}
 
-customElements.define('todo-item', TodoItem);
-customElements.define('todo-items', TodoItems);
+  customElements.define('todo-item', TodoItem);
+  customElements.define('todo-items', TodoItems);
 
-function key() {
-  return Math.random().toString(36).slice(2)
-}
+  function key() {
+    return Math.random().toString(36).slice(2)
+  }
+
 </script>
