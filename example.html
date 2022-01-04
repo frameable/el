@@ -1,11 +1,18 @@
-<body>
+<!doctype html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
       font-family: Roboto;
       margin-top: 16px;
     }
-    h2,h3,h4,h5,h6 {
+    body {
+      padding: 8px;
+      margin: 8px auto;
+      max-width: 800px;
+    }
+    h1,h2,h3,h4,h5,h6 {
       margin: 0;
     }
     .flex {
@@ -52,9 +59,10 @@
       margin-right: 4px;
     }
   </style>
+</head>
 
+<body>
   <h1>Todo list</h1>
-
   <todo-items></todo-items>
 </body>
 
@@ -97,10 +105,10 @@
             onclick=${this.toggleDone}>
         </span>
         <span><p class="muted">${this.item.id}</p></span>
-        <span class="title ${this.item.done && 'title--completed'}">
+        <span class="title-column ${this.item.done && 'title--completed'}">
           <h3>${this.item.title}</h3>
         </span>
-        <span>
+        <span class="tools-column">
           <button class="btn" onclick=${this.editItem}>Edit</button>
           <button class="btn delete muted" title="Delete item" onclick=${this.deleteItem}>&times;</button>
         </span>
@@ -115,7 +123,7 @@
           }
           > span {
             display: table-cell;
-            padding: 1em;
+            padding: 0.5em;
             border-bottom: 1px solid #2232;
           }
         }
@@ -133,12 +141,22 @@
           background: mediumseagreen;
           color: white;
         }
+        .title-column {
+          width: 100%;
+        }
         .status-column {
           min-width: 3em;
         }
         .title--completed {
           opacity: 0.5;
           text-decoration: line-through;
+        }
+        .tools-column {
+          white-space: nowrap;
+        }
+        input[type=checkbox] {
+          position: relative;
+          top: 2px;
         }
       `
     }
@@ -167,10 +185,10 @@
               Items
               <span class="badge ml-4 mr-4">${items.length}</span>
             </h4>
-            <span class="ml-4 flex items-end">
+            <label class="ml-4 flex items-end">
               <input type="checkbox" onclick=${this.toggleHideCompleted}>
               <small class="muted">Hide completed</small>
-            </span>
+            </label>
             <button class="btn primary" onclick=${this.addItem}>Add item</button>
           </header>
           <div class="items">
@@ -185,11 +203,15 @@
       return `
         .items-container {
           display: table;
+          margin-top: 16px;
+          max-width: 600px;
+          width: 100%;
         }
         header {
           background: whitesmoke;
           box-shadow: 0 1px 1px #1232;
-          padding: 16px;
+          padding: 16px 8px;
+
           > *:last-child {
             margin-left: auto;
           }
@@ -202,7 +224,7 @@
   customElements.define('todo-items', TodoItems);
 
   function key() {
-    return Math.random().toString(36).slice(2)
+    return Math.random().toString(36).slice(2,8)
   }
 
 </script>
