@@ -10,8 +10,8 @@ El is based on [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web
 - Built-in observable store
 - Reactive templates with one-way binding
 - Fast differential DOM updates
-- Scoped CSS via shadow DOM
-- Support for implicit nesting and ampersands from SCSS
+- Scoped styles via shadow DOM
+- CSS preprocessing for implicit nesting and ampersands
 - Watch expressions
 - Component lifecycle methods
 - Just ~150 lines of source code (~1.7kb gzipped)
