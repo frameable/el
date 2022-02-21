@@ -128,8 +128,9 @@ class El extends HTMLElement {
     let open, opened, close
     for (const line of src.split('\n')) {
       if (line.match(/^\s*@[msdk].*\{/)) {
+        opened && lines.push('}');
+        opened = open = close = false;
         lines.push(line)
-        stack.push('')
       } else if (line.match(/\{\s*$/)) {
         open = true
         stack.push(line.replace('{','').trim())
