@@ -162,6 +162,26 @@ class TodoItem extends El {
 
 > Once a template is rendered to html, it then needs to find its way into the DOM.  El renders first to a [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment), then traverses the fragment and its corresponding component in the actual DOM, and selectively alters the real DOM only where the two structures diverge.
 
+#### Refs
+
+Refer to elements within a component by the name specified by their `ref` attribute.
+
+```javascript
+class TodoItemDescription extends El {
+  save() {
+    store.setDescription(this.itemId, this.$refs.descriptionInput.value);
+  }
+  render(html) {
+    return html`
+      <input ref="descriptionInput">
+      <button onclick=${this.save}>Save</button>`
+    `;
+  }
+}
+```
+
+> Refs are implemented as a dynamic getter via Proxy.  When the property is read, the proxy handler runs a `querySelector` query on the component root, so these properties will yield "live" results but may not be ideal in a tight loop where performance is critical.
+
 ## Style
 
 Specify CSS via the `css` method. Styles are scoped so that they only apply to elements in this component.  Neither ancestors nor descendants of this component will be affected by these styles.The built-in preprocessor adds support for implicit nesting and ampersand selectors.
