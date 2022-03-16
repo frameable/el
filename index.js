@@ -40,7 +40,7 @@ class El extends HTMLElement {
         if (attr.value in El.stash) el[attr.name] = El.stash[attr.value]
   }
   get $refs() {
-    return new Proxy({}, { get: (obj, key) => this.querySelector(`[ref="${key}"]`) })
+    return new Proxy({}, { get: (obj, key) => this.shadowRoot.querySelector(`[ref="${key}"]`)
   }
   $watch(_, fn) {
     if (!El.dep._path) return;
