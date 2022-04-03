@@ -60,7 +60,7 @@ El serves as a base class for custom elements / WebComponents.  Inherit from `El
 If you are new to custom elements, some tips per the spec:
 
 - element tag names must be lowercase with at least one hyphen
-- `customElements` takes the given class and registers with the tag name
+- `customElements.define` takes the given class and registers with the tag name
 - in the markup, custom elements cannot be self-closing
 
 #### Lifecycle methods
