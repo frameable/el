@@ -1,13 +1,14 @@
 class El extends HTMLElement {
+  static els = {}
+  static stash = {}
+  static tags = {}
+  static keys = new WeakMap
+  static styles = {}
+  static deps = {}
   constructor() {
     super()
     this._id = `${this.tagName}:${this.getAttribute('key') || Math.random().toString(36).slice(2)}`
-    El.els = El.els || {}
-    El.stash = El.stash || {}
-    El.tags = El.tags || {}
-    El.keys = El.keys || new WeakMap
     El.style = El.style || El.importStyle()
-    El.styles = El.styles || {};
     this.$html = this.$html.bind(this)
   }
   connectedCallback() {
@@ -26,7 +27,7 @@ class El extends HTMLElement {
   _update() {
     El._contextId = this._id
     this._unstash()
-    const html = this.render(this.$html);
+    const html = this.render && this.render(this.$html);
     const shadow = this.shadowRoot || this.attachShadow({mode: 'open'})
     El.styles[this.tagName] = El.styles[this.tagName] ||
       `<link rel="stylesheet" href="data:text/css;base64,${btoa(El.style + (this.css && El.zcss(this.css())) || '')}">`
@@ -76,7 +77,6 @@ class El extends HTMLElement {
       setTimeout(_ => El.deps[path][id]())
   }
   static dep(path) {
-    El.deps = El.deps || {};
     El.dep._path = !El._contextId && path
     if (!El._contextId) return
     const contextId = El._contextId
@@ -91,7 +91,7 @@ class El extends HTMLElement {
     }
     return new Proxy(x, {
       set(x, key) {
-        setTimeout(El.notify(path + '/' + key));
+        El.notify(path + '/' + key);
         return Reflect.set(...arguments);
       },
       get(x, key) {
