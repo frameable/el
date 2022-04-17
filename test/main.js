@@ -2,12 +2,20 @@ import assert from 'assert'
 import { suite } from './index.js'
 import { parseHTML } from 'linkedom'
 
-const { document, HTMLElement, customElements } = parseHTML(`<html><body></body></html>`)
+function setup() {
+  const { document, HTMLElement, customElements } = parseHTML(`<html><body></body></html>`)
+  global.customElements = customElements
+  global.document = document
+  global.HTMLElement = HTMLElement
+  global.btoa = str => Buffer.from(str).toString('base64')
+  global.atob = str => Buffer.from(str, 'base64').toString()
+  global.requestAnimationFrame = f => setTimeout(f, 16)
+  try { El.tags = {} } catch {}
+}
 
-global.document = document;
-global.HTMLElement = HTMLElement;
+setup();
 
-const { default: El } = await import('../index.js');
+const { default: El } = await import('../index.js')
 
 suite('main', test => {
 
@@ -24,15 +32,73 @@ suite('main', test => {
       handleClick() { clicked = true }
       render(html) { return html`<button onclick=${this.handleClick}></button>` }
     }
-    customElements.define('event-el', EventEl);
+    customElements.define('event-el', EventEl)
     const eventEl = document.createElement('event-el')
     document.body.appendChild(eventEl);
-    eventEl.shadowRoot.querySelector('button').click();
+    eventEl.shadowRoot.querySelector('button').click()
     await new Promise(r => setTimeout(r))
-    assert.equal(clicked, true, 'button click set clicked ot true');
+    assert.equal(clicked, true, 'button click set clicked true')
+  })
+
+  test('attributes', async () => {
+    setup();
+    class ListEl extends El {
+      created() {
+        this.item = { price: 20, title: 'Desk' }
+      }
+      render(html) {
+        return html`<item-el item=${this.item}></item-el>`
+      }
+    }
+    class ItemEl extends El {
+      render(html) {
+        return html`<div>INSIDE</div>`
+      }
+    }
+    customElements.define('list-el', ListEl)
+    customElements.define('item-el', ItemEl)
+    const listEl = document.createElement('list-el')
+    document.body.appendChild(listEl)
+    const itemEl = listEl.shadowRoot.querySelector('item-el')
+    assert.deepEqual(itemEl.item, { price: 20, title: 'Desk' })
+  })
+
+  test('reactive attributes', async () => {
+    setup();
+    class ListEl extends El {
+      created() {
+        this.state = El.observable({ price: 20, title: 'Desk' })
+      }
+      get formattedPrice() {
+        return '$' + this.state.price.toFixed(2);
+      }
+      render(html) {
+        return html`
+          <div>
+            <span>${this.formattedPrice}</span>
+            <span>${this.formattedPrice}</span>
+            <item-el price=${this.formattedPrice}></item-el>
+          </div>
+        `;
+      }
+    }
+    class ItemEl extends El {
+      render(html) {
+        return html`${this.price}`
+      }
+    }
+    customElements.define('list-el', ListEl)
+    customElements.define('item-el', ItemEl)
+    const listEl = document.createElement('list-el')
+    document.body.appendChild(listEl)
+    const itemEl = listEl.shadowRoot.querySelector('item-el')
+    listEl.state.price = 30
+    await El.nextTick()
+    assert(itemEl.shadowRoot.innerHTML.match(/30.00/))
   })
 
   test('refs', async () => {
+    setup();
     let clicked = false
     class RefEl extends El {
       handleClick() { clicked = true }
@@ -41,11 +107,12 @@ suite('main', test => {
     customElements.define('ref-el', RefEl);
     const refEl = document.createElement('ref-el')
     document.body.appendChild(refEl);
-    assert.equal(refEl.$refs.heading.tagName, 'H1');
+    assert.equal(refEl.$refs.heading.tagName, 'H1')
   })
 
   test('lifecycle', async () => {
 
+    setup();
     let created = false
     let mounted = false
     let unmounted = false
@@ -81,6 +148,7 @@ suite('main', test => {
   })
 
   test('css', async () => {
+    setup();
     class CssEl extends El {
       render(html) {
         return `<ul><li>Hello, World!</li></ul>`
@@ -98,8 +166,8 @@ suite('main', test => {
     customElements.define('css-el', CssEl)
     const cssEl = document.createElement('css-el')
     document.body.appendChild(cssEl)
-    const css = atob(cssEl.shadowRoot.querySelector('link').href.split(',')[1]);
-    assert.equal(css.replace(/\s+/g, ' '), 'ul li{ color: red; }');
+    const css = atob(cssEl.shadowRoot.querySelector('link').href.split(',')[1])
+    assert.equal(css.replace(/\s+/g, ' '), 'ul li{ color: red; }')
   })
 })
 

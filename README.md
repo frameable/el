@@ -14,7 +14,7 @@ El is based on [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web
 - CSS preprocessing for implicit nesting and ampersands
 - Watch expressions
 - Component lifecycle methods
-- Just ~150 lines of source code (~1.7kb gzipped)
+- Just ~150 lines of source code (~2kb gzipped)
 - Minimal surface area with easy learning curve
 - No dependencies on any other libraries
 - No need for build tools like Webpack or Rollup
