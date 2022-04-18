@@ -10,6 +10,8 @@ class El extends HTMLElement {
     this._id = `${this.tagName}:${this.getAttribute('key') || Math.random().toString(36).slice(2)}`
     El.style = El.style || El.importStyle()
     this.$html = this.$html.bind(this)
+    this._cache = { d: {}, clear: _ => this._cache.d = {} }
+    this._memoize();
   }
   connectedCallback() {
     this._parentId = El._contextId
@@ -28,6 +30,15 @@ class El extends HTMLElement {
   disconnectedCallback() {
     this.unmounted && this.unmounted()
   }
+  _memoize() {
+    const descriptors = Object.getOwnPropertyDescriptors(this.constructor.prototype)
+    for (const [key, d] of Object.entries(descriptors).filter(x => x[1].get))
+      Object.defineProperty(this.constructor.prototype, key, {
+        get() {
+          return (key in this._cache.d) ? this._cache.d[key] : (this._cache.d[key] = d.get.call(this))
+        }
+      })
+  }
   _queue() {
     if (this._queued) return;
     this._queued = requestAnimationFrame(_ => this._update() || delete this._queued)
@@ -35,6 +46,7 @@ class El extends HTMLElement {
   }
   _update() {
     El._contextId = this._id
+    this._cache.clear();
     this._unstash()
     const html = this.render && this.render(this.$html);
     const shadow = this.shadowRoot || this.attachShadow({ mode: 'open' })
@@ -92,7 +104,7 @@ class El extends HTMLElement {
   }
   static dep(path) {
     El.dep._path = !El._contextId && path
-    if (!El._contextId) return
+    if (!El._contextId) return true
     const contextId = El._contextId
     El.deps[path] = El.deps[path] || {}
     return El.deps[path][El._contextId] = _ => El.els[contextId]._queue()

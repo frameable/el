@@ -110,6 +110,27 @@ suite('main', test => {
     assert.equal(refEl.$refs.heading.tagName, 'H1')
   })
 
+  test('memoized getters', async () => {
+    setup()
+    let c = 0;
+    class GetterEl extends El {
+      get count() { return c++ }
+      render(html) { return html`
+        <div>${this.count}|${this.count}</div>
+      `};
+    }
+    customElements.define('getter-el', GetterEl);
+    const getterEl = document.createElement('getter-el')
+    document.body.appendChild(getterEl)
+    await El.nextTick()
+    assert.equal(c, 1)
+    assert(getterEl.shadowRoot.innerHTML.match(/\b0\|0\b/), 'getter called just once')
+    getterEl._queue()
+    getterEl._queue()
+    await El.nextTick()
+    assert(getterEl.shadowRoot.innerHTML.match(/\b1\|1\b/), 'getter called just once more')
+  })
+
   test('lifecycle', async () => {
 
     setup();
