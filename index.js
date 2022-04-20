@@ -61,6 +61,7 @@ class El extends HTMLElement {
     for (const el of [...(this.shadowRoot || this).querySelectorAll('*'), this])
       for (const attr of el.attributes)
         if (attr.value in El.stash) el[camel(attr.name)] = El.stash[attr.value]
+        else if (attr.name in el.__proto__) {}
         else try { el[camel(attr.name)] = attr.value } catch {}
   }
   get $refs() {
