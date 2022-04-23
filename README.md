@@ -182,6 +182,34 @@ class TodoItemDescription extends El {
 
 > Refs are implemented as a dynamic getter via Proxy.  When the property is read, the proxy handler runs a `querySelector` query on the component root, so these properties will yield "live" results but may not be ideal in a tight loop where performance is critical.
 
+
+#### Computed properties
+
+Properties accessed via getters will be computed just once per render cycle.  In the following example, the `dependents` property invokes the getter just once, even though it is referred to multiple times in template.
+
+```javascript
+class TodoItem extends El {
+
+  get dependents() {
+    // expensive execution is cached per render
+    return store.tasks.filter(item => item.dependencies.includes(this.item.id));
+  }
+
+  render(html) {
+    return html`
+      <h1>${this.title}</h1>
+      <h4>${this.dependents.length} dependent tasks</h4>
+      <ul>
+        ${this.dependents.map(d => html`
+          <li>${d.title}</li>
+        `)}
+      </ul>
+    `;
+  }
+}
+```
+
+
 ## Style
 
 Specify CSS via the `css` method. Styles are scoped so that they only apply to elements in this component.  Neither ancestors nor descendants of this component will be affected by these styles.The built-in preprocessor adds support for implicit nesting and ampersand selectors.
