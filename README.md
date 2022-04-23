@@ -192,7 +192,7 @@ class TodoItem extends El {
 
   get dependents() {
     // expensive execution is cached per render
-    return store.tasks.filter(item => item.dependencies.includes(this.item.id));
+    return store.items.filter(item => item.dependencies.includes(this.item.id));
   }
 
   render(html) {
