@@ -168,6 +168,33 @@ suite('main', test => {
     assert.equal(unmounted, true, 'unmounted true after unmounting')
   })
 
+  test('adjacent', async () => {
+
+    setup();
+    class AdjEl extends El {
+      toggle = true;
+      render(html) {
+        return html`
+          <div ref="toggle">
+            ${this.toggle
+              ? html`<i>ON</i>`
+              : html`<b>OFF</b>`
+            }
+          </div>
+        `;
+      }
+    }
+
+    customElements.define('adj-el', AdjEl)
+    const adjEl = document.createElement('adj-el')
+    document.body.appendChild(adjEl)
+    assert.equal(adjEl.$refs.toggle.innerHTML.trim(), '<i>ON</i>');
+    adjEl.toggle = false;
+    adjEl._update();
+    await adjEl.$nextTick();
+    assert.equal(adjEl.$refs.toggle.innerHTML.trim(), '<b>OFF</b>');
+  });
+
   test('css', async () => {
     setup();
     class CssEl extends El {

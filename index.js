@@ -141,7 +141,7 @@ class El extends HTMLElement {
       else if (rs == re) l.removeChild(lc[ls++])
       else if (content(lc[ls]) == content(rc[rs])) ls++ & rs++
       else if (content(lc[le - 1]) == content(rc[re - 1])) le-- & re--
-      else if (lc[ls] && rc[rs].children) El.morph(lc[ls++], rc[rs++])
+      else if (lc[ls] && rc[rs].children && lc[ls].tagName == rc[rs].tagName) El.morph(lc[ls++], rc[rs++])
       else lc[ls++].replaceWith(rc[rs++])
   }
   static async nextTick(f) {
