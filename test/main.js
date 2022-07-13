@@ -40,7 +40,7 @@ suite('main', test => {
     assert.equal(clicked, true, 'button click set clicked true')
   })
 
-  test('attributes', async () => {
+  test('object attributes', async () => {
     setup();
     class ListEl extends El {
       created() {
@@ -61,6 +61,29 @@ suite('main', test => {
     document.body.appendChild(listEl)
     const itemEl = listEl.shadowRoot.querySelector('item-el')
     assert.deepEqual(itemEl.item, { price: 20, title: 'Desk' })
+  })
+
+  test('array attributes', async () => {
+    setup();
+    class ListEl extends El {
+      created() {
+        this.items = [{ price: 20, title: 'Desk' }]
+      }
+      render(html) {
+        return html`<item-el items=${this.items}></item-el>`
+      }
+    }
+    class ItemEl extends El {
+      render(html) {
+        return html`<div>INSIDE</div>`
+      }
+    }
+    customElements.define('list-el', ListEl)
+    customElements.define('item-el', ItemEl)
+    const listEl = document.createElement('list-el')
+    document.body.appendChild(listEl)
+    const itemEl = listEl.shadowRoot.querySelector('item-el')
+    assert.deepEqual(itemEl.items, [{ price: 20, title: 'Desk' }])
   })
 
   test('reactive attributes', async () => {
