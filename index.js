@@ -38,6 +38,7 @@ class El extends HTMLElement {
           return (key in this._cache.d) ? this._cache.d[key] : (this._cache.d[key] = d.get.call(this))
         }
       })
+    this.constructor.prototype._memoize = new Function;
   }
   _queue() {
     if (this._queued) return;
