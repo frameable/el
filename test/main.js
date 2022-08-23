@@ -2,6 +2,8 @@ import assert from 'assert'
 import { suite } from './index.js'
 import { parseHTML } from 'linkedom'
 
+let debug = { updates: [] };
+
 function setup() {
   const { document, HTMLElement, customElements } = parseHTML(`<html><body></body></html>`)
   global.customElements = customElements
@@ -10,23 +12,31 @@ function setup() {
   global.btoa = str => Buffer.from(str).toString('base64')
   global.atob = str => Buffer.from(str, 'base64').toString()
   global.requestAnimationFrame = f => setTimeout(f, 16)
-  try { El.tags = {} } catch {}
+  try { ElBase.tags = {} } catch {}
+  debug.updates = [];
 }
 
 setup();
 
-const { default: El } = await import('../index.js')
+const { default: ElBase } = await import('../index.js')
 
-suite('main', test => {
+class El extends ElBase {
+  _update(...args) {
+    super._update(...args)
+    debug.updates.push([this.tagName, this._id])
+  }
+}
 
-  test('basic', async() => {
+suite('main', async test => {
+
+  await test('basic', async () => {
     class BasicEl extends El {}
     customElements.define('basic-element', BasicEl)
     const basicEl = document.createElement('basic-el')
     assert(basicEl instanceof HTMLElement, 'we have an HTMLElement instance')
   })
 
-  test('events', async () => {
+  await test('events', async () => {
     let clicked = false
     class EventEl extends El {
       handleClick() { clicked = true }
@@ -40,7 +50,7 @@ suite('main', test => {
     assert.equal(clicked, true, 'button click set clicked true')
   })
 
-  test('object attributes', async () => {
+  await test('object attributes', async () => {
     setup();
     class ListEl extends El {
       created() {
@@ -63,7 +73,7 @@ suite('main', test => {
     assert.deepEqual(itemEl.item, { price: 20, title: 'Desk' })
   })
 
-  test('array attributes', async () => {
+  await test('array attributes', async () => {
     setup();
     class ListEl extends El {
       created() {
@@ -86,7 +96,7 @@ suite('main', test => {
     assert.deepEqual(itemEl.items, [{ price: 20, title: 'Desk' }])
   })
 
-  test('reactive attributes', async () => {
+  await test('reactive attributes', async () => {
     setup();
     class ListEl extends El {
       created() {
@@ -117,10 +127,103 @@ suite('main', test => {
     const itemEl = listEl.shadowRoot.querySelector('item-el')
     listEl.state.price = 30
     await El.nextTick()
+    await El.nextTick()
     assert(itemEl.shadowRoot.innerHTML.match(/30.00/))
   })
 
-  test('refs', async () => {
+  await test('reactive attribute objects', async () => {
+    setup();
+    class ListEl extends El {
+      created() {
+        this.state = El.observable({ price: 20, title: 'Desk', sellers: [0, 1] })
+      }
+      get formattedPrice() {
+        return '$' + this.state.price.toFixed(2);
+      }
+      render(html) {
+        return html`
+          <div>
+            <span>${this.formattedPrice}</span>
+            <span>${this.formattedPrice}</span>
+            <sellers-el sellers=${this.state.sellers}></sellers-el>
+          </div>
+        `;
+      }
+    }
+    class SellersEl extends El {
+      render(html) {
+        return html`${this.sellers.length}`
+      }
+    }
+    customElements.define('list-el', ListEl)
+    customElements.define('sellers-el', SellersEl)
+    const listEl = document.createElement('list-el')
+    document.body.appendChild(listEl)
+    const sellersEl = listEl.shadowRoot.querySelector('sellers-el')
+    assert(sellersEl.shadowRoot.innerHTML.match(/>2/))
+    listEl.state.sellers.push(2);
+    await El.nextTick()
+    assert(sellersEl.shadowRoot.innerHTML.match(/>3/))
+  })
+
+  await test('dashboard', async () => {
+    setup();
+    class DashboardEl extends El {
+      created() {
+        this.state = El.observable({
+          items: [
+            { id: 1, price: 20, title: 'Desk' },
+            { id: 2, price: 30, title: 'Chair' },
+            { id: 3, price: 10, title: 'Book' }
+          ],
+          showSummary: false,
+        })
+      }
+      render(html) {
+        return html`
+          <div>
+            <list-el items=${this.state.items}></list-el>
+            ${this.state.showSummary && html`
+              <div>${this.state.items.length} items</div>
+            `}
+          </div>
+        `;
+      }
+    }
+    class ListEl extends El {
+      render(html) {
+        return html`
+          ${this.items.map(i => html`<item-el key="item-${i.id}" item=${i}></item-el>`)}
+        `;
+      }
+    }
+    class ItemEl extends El {
+      render(html) {
+        return html`
+          <div>
+            <span>${this.item.id}</span>
+            <h4>${this.item.title}</h4>
+            <span>${this.item.price}</span>
+          </div>
+        `;
+      }
+    }
+
+    customElements.define('dashboard-el', DashboardEl)
+    customElements.define('list-el', ListEl)
+    customElements.define('item-el', ItemEl)
+
+    const dashboardEl = document.createElement('dashboard-el')
+    document.body.appendChild(dashboardEl)
+
+    dashboardEl.state.showSummary = true
+
+    debug.updates = [];
+    await dashboardEl.$nextTick()
+    assert.equal(debug.updates.length, 1)
+  })
+
+  await test('refs', async () => {
     setup();
     let clicked = false
     class RefEl extends El {
@@ -133,7 +236,7 @@ suite('main', test => {
     assert.equal(refEl.$refs.heading.tagName, 'H1')
   })
 
-  test('memoized getters', async () => {
+  await test('memoized getters', async () => {
     setup()
     let c = 0;
     class GetterEl extends El {
@@ -154,7 +257,7 @@ suite('main', test => {
     assert(getterEl.shadowRoot.innerHTML.match(/\b1\|1\b/), 'getter called just once more')
   })
 
-  test('lifecycle', async () => {
+  await test('lifecycle', async () => {
 
     setup();
     let created = false
@@ -191,7 +294,7 @@ suite('main', test => {
     assert.equal(unmounted, true, 'unmounted true after unmounting')
   })
 
-  test('adjacent', async () => {
+  await test('adjacent', async () => {
 
     setup();
     class AdjEl extends El {
@@ -218,7 +321,7 @@ suite('main', test => {
     assert.equal(adjEl.$refs.toggle.innerHTML.trim(), '<b>OFF</b>');
   });
 
-  test('css', async () => {
+  await test('css', async () => {
     setup();
     class CssEl extends El {
       render(html) {

@@ -43,7 +43,6 @@ class El extends HTMLElement {
   _queue() {
     if (this._queued) return;
     this._queued = requestAnimationFrame(_ => this._update() || delete this._queued)
-    Object.values(El.els).filter(e => e._parentId == this._id).map(e => e._queue());
   }
   _update() {
     El._contextId = this._id
@@ -59,11 +58,14 @@ class El extends HTMLElement {
   }
   _unstash() {
     const camel = s => s.replace(/-\w/g, c => c[1].toUpperCase())
+    const _contextId = El._contextId;
+    El._contextId = this._id;
     for (const el of [...(this.shadowRoot || this).querySelectorAll('*'), this])
       for (const attr of el.attributes)
         if (attr.value in El.stash) el[camel(attr.name)] = El.stash[attr.value]
         else if (attr.name in el.__proto__) {}
         else try { el[camel(attr.name)] = attr.value } catch {}
+    El._contextId = _contextId
   }
   get $refs() {
     return new Proxy({}, { get: (obj, key) => this.shadowRoot.querySelector(`[ref="${key}"]`) });
@@ -133,7 +135,10 @@ class El extends HTMLElement {
     const key = e => e.nodeType == 1 && customElements.get(e.tagName.toLowerCase()) && e.getAttribute('key') || NaN
 
     for (const a of r.attributes || [])
-      if (l.getAttribute(a.name) != a.value) l.setAttribute(a.name, a.value)
+      if (l.getAttribute(a.name) != a.value) {
+        l.setAttribute(a.name, a.value)
+        l._queue && l._queue();
+      }
     for (const a of l.attributes || [])
       if (!r.hasAttribute(a.name)) l.removeAttribute(a.name)
 
