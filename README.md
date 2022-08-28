@@ -209,10 +209,26 @@ class TodoItem extends El {
 }
 ```
 
+#### Escaping
+
+Interpolated values are HTML-escaped by default. If you have sanitized markup that you would like to include as-is, use `html.raw`:
+
+```javascript
+class TodoItemDescription extends El {
+  render(html) {
+    return html`
+      <div class="description">
+        ${html.raw(this.sanitizedDescriptionHTML)}
+      </div>
+    `;
+  }
+}
+```
+
 
 ## Style
 
-Specify CSS via the `css` method. Styles are scoped so that they only apply to elements in this component.  Neither ancestors nor descendants of this component will be affected by these styles.The built-in preprocessor adds support for implicit nesting and ampersand selectors.
+Specify CSS via the `css` method. Styles are scoped so that they only apply to elements in this component.  Neither ancestors nor descendants of this component will be affected by these styles. The built-in preprocessor adds support for implicit nesting and ampersand selectors.
 
 ```javascript
 class TodoItem extends El {
@@ -247,3 +263,5 @@ class TodoItem extends El {
 > The shadow DOM provides scoped CSS so that styles defined within a component don't leak either up to parents or down to children.  By default, global styles will also not be applied within components, which is great when you're building abstract components to be used across projects, but a hinderance when you want different components within a single application to have consistent fonts, colors, spacing, etc.  El clones global styles and applies those styles to each component via `link` tag with a data URI, so components will be affected by application-wide stylesheets.
 
 > El runs a stack-based line-by-line source filter on CSS in order to implement nesting CSS and the ampersand selector, popularized by SCSS and other tools, now a W3C working draft [CSS Nesting](https://www.w3.org/TR/css-nesting-1/).
+
+

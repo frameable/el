@@ -243,7 +243,7 @@ suite('main', async test => {
       get count() { return c++ }
       render(html) { return html`
         <div>${this.count}|${this.count}</div>
-      `};
+      `}
     }
     customElements.define('getter-el', GetterEl);
     const getterEl = document.createElement('getter-el')
@@ -319,6 +319,53 @@ suite('main', async test => {
     adjEl._update();
     await adjEl.$nextTick();
     assert.equal(adjEl.$refs.toggle.innerHTML.trim(), '<b>OFF</b>');
+  });
+
+  await test('escape html', async () => {
+
+    setup();
+    class TitleEl extends El {
+      title = '<i>test</i>'
+      render(html) {
+        return html`
+          <h1 ref="esc">${this.title}</h1>
+          <div ref="raw">${html.raw(this.title)}</div>
+        `;
+      }
+    }
+
+    customElements.define('title-el', TitleEl)
+    const titleEl = document.createElement('title-el')
+    document.body.appendChild(titleEl)
+    assert.equal(titleEl.$refs.esc.innerHTML.trim(), '&lt;i&gt;test&lt;/i&gt;');
+    assert.equal(titleEl.$refs.raw.innerHTML.trim(), '<i>test</i>');
+  });
+
+  await test('key missing warning', async () => {
+
+    setup();
+
+    let warnings = [];
+    const _warn = console.warn
+    console.warn = msg => warnings.push(msg)
+
+    class ItemEl extends El {
+      title = '<i>test</i>'
+      render(html) {
+        return html`<h1>${this.title}</h1>`;
+      }
+    }
+
+    customElements.define('item-el', ItemEl)
+
+    for (const i of Array(2).keys()) {
+      const itemEl = document.createElement('item-el')
+      document.body.appendChild(itemEl)
+    }
+
+    assert.equal(warnings.length, 1, "we logged when we didn't have keys")
+    console.warn = _warn;
+
   });
 
   await test('css', async () => {

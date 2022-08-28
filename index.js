@@ -5,16 +5,16 @@ class El extends HTMLElement {
   static keys = new WeakMap
   static styles = {}
   static deps = {}
+  static Raw = class Raw extends String {}
   constructor() {
     super()
     this._id = `${this.tagName}:${this.getAttribute('key') || Math.random().toString(36).slice(2)}`
     El.style = El.style || El.importStyle()
-    this.$html = this.$html.bind(this)
+    this.$html = Object.assign(this.$html.bind(this), { raw: x => new El.Raw(x) })
     this._cache = { d: {}, clear: _ => this._cache.d = {} }
-    this._memoize();
+    this._memoize()
   }
   connectedCallback() {
-    this._parentId = El._contextId
     El._contextId = this._id
     this._unstash()
     this.created && !this._created && this.created()
@@ -25,7 +25,6 @@ class El extends HTMLElement {
     if (El.tags[this.tagName] && !this.getAttribute('key'))
       console.warn(`Each ${this.tagName} should have a unique \`key\` attribute`)
     El.tags[this.tagName] = true
-    El._contextId = this._parentId
   }
   disconnectedCallback() {
     this.unmounted && this.unmounted()
@@ -93,9 +92,9 @@ class El extends HTMLElement {
       }
       else if (strings[i].endsWith('=')) vals[i] = JSON.stringify(vals[i])
       else if (vals[i] instanceof Array) vals[i] = vals[i].join('')
+      else vals[i] = El.escape(vals[i])
     }
-    function v(x) { return x || x === 0 ? x : '' }
-    return strings.map((s, i) => [s, v(vals[i])].join``).join``
+    return new El.Raw(strings.map((s, i) => [s, vals[i]].join``).join``)
   }
   static importStyle() {
     let src = ''
@@ -170,6 +169,9 @@ class El extends HTMLElement {
       }
     }
     return close && lines.push('}') && lines.join('\n')
+  }
+  static escape(v) {
+    return v instanceof El.Raw ? v : v === 0 ? v : String(v || '').replace(/[<>'"]/g, c => `&#${c.charCodeAt(0)}`)
   }
 }
 

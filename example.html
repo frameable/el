@@ -94,8 +94,8 @@
       return html`
         <span class="status-column">
           ${this.item.done
-            ? `<span class="badge success">Done!</span>`
-            : `<span class="badge">New</span>`
+            ? html`<span class="badge success">Done!</span>`
+            : html`<span class="badge">New</span>`
           }
         </span>
         <span>
