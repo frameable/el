@@ -39,9 +39,8 @@ class El extends HTMLElement {
       })
     this.constructor.prototype._memoize = new Function;
   }
-  _queue() {
-    if (this._queued) return;
-    this._queued = requestAnimationFrame(_ => this._update() || delete this._queued)
+  $update() {
+    this._queued = this._queued || requestAnimationFrame(_ => this._update() || delete this._queued)
   }
   _update() {
     El._contextId = this._id
@@ -110,7 +109,7 @@ class El extends HTMLElement {
     if (!El._contextId) return true
     const contextId = El._contextId
     El.deps[path] = El.deps[path] || {}
-    return El.deps[path][El._contextId] = _ => El.els[contextId]._queue()
+    return El.deps[path][El._contextId] = _ => El.els[contextId].$update()
   }
   static observable(x, path = Math.random().toString(36).slice(2)) {
     if ((typeof x != 'object' || x === null) && El.dep(path)) return x
@@ -136,7 +135,7 @@ class El extends HTMLElement {
     for (const a of r.attributes || [])
       if (l.getAttribute(a.name) != a.value) {
         l.setAttribute(a.name, a.value)
-        l._queue && l._queue();
+        l.$update && l.$update();
       }
     for (const a of l.attributes || [])
       if (!r.hasAttribute(a.name)) l.removeAttribute(a.name)

@@ -251,10 +251,30 @@ suite('main', async test => {
     await El.nextTick()
     assert.equal(c, 1)
     assert(getterEl.shadowRoot.innerHTML.match(/\b0\|0\b/), 'getter called just once')
-    getterEl._queue()
-    getterEl._queue()
+    getterEl.$update()
+    getterEl.$update()
     await El.nextTick()
     assert(getterEl.shadowRoot.innerHTML.match(/\b1\|1\b/), 'getter called just once more')
+  })
+
+  await test('render queue', async () => {
+    setup()
+    class RenderEl extends El {
+      count = 0
+      render(html) { 
+        this.count++;
+        return html`<div>${this.count}</div>`
+      }
+    }
+    customElements.define('render-el', RenderEl);
+    const renderEl = document.createElement('render-el')
+    document.body.appendChild(renderEl)
+    await El.nextTick()
+    assert.equal(renderEl.count, 1)
+    renderEl.$update()
+    renderEl.$update()
+    await El.nextTick()
+    assert.equal(renderEl.count, 2, 'render called just once more')
   })
 
   await test('lifecycle', async () => {
