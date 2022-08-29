@@ -110,7 +110,7 @@ export class El extends HTMLElement {
     if (!El._contextId) return true
     const contextId = El._contextId
     El.deps[path] = El.deps[path] || {}
-    return El.deps[path][El._contextId] = El.els[contextId].$update
+    return El.deps[path][El._contextId] = _ => El.els[contextId].$update()
   }
   static observable(x, path = Math.random().toString(36).slice(2)) {
     if ((typeof x != 'object' || x === null) && El.dep(path)) return x
