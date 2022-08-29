@@ -45,7 +45,7 @@ El is based on [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web
 
 El consists of a single source JavaScript file, [`el.js`](https://raw.githubusercontent.com/frameable/el/main/el.js). You can drop it into your project directly, and import:
 
-```
+```html
 <script type="module">
   import { El } from './el.js'
   /* ... */
@@ -284,13 +284,13 @@ class TodoItem extends El {
 
 ## Resources
 
-##### MDN on Web Components
+MDN on Web Components \
 https://developer.mozilla.org/en-US/docs/Web/Web_Components
 
-##### Syntax highlighting
+Syntax highlighting \
 https://github.com/jonsmithers/vim-html-template-literals (Vim) \
 https://github.com/0x00000001A/es6-string-html (VS Code)
 
-##### zcss preprocessor
+zcss preprocessor \
 https://github.com/dchester/zcss.js
 
