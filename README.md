@@ -52,7 +52,7 @@ El consists of a single source JavaScript file, [`el.js`](https://raw.githubuser
 </script>
 ```
 
-Or else your build system and install from the npm registry:
+Or else install from the npm registry:
 
 ```
 npm install @frameable/el
