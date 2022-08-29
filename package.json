@@ -2,6 +2,7 @@
   "name": "el",
   "description": "Minimal JavaScript application framework",
   "version": "0.6.1",
+  "main": "./el.js",
   "type": "module",
   "scripts": {
     "test": "node test"

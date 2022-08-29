@@ -1,4 +1,4 @@
-class El extends HTMLElement {
+export class El extends HTMLElement {
   static els = {}
   static stash = {}
   static tags = {}
@@ -13,6 +13,7 @@ class El extends HTMLElement {
     this.$html = Object.assign(this.$html.bind(this), { raw: x => new El.Raw(x) })
     this._cache = { d: {}, clear: _ => this._cache.d = {} }
     this._memoize()
+    this.$update = this.$update.bind(this)
   }
   connectedCallback() {
     El._contextId = this._id
@@ -49,7 +50,7 @@ class El extends HTMLElement {
     const html = this.render && this.render(this.$html);
     const shadow = this.shadowRoot || this.attachShadow({ mode: 'open' })
     El.styles[this.tagName] = El.styles[this.tagName] ||
-      `<link rel="stylesheet" href="data:text/css;base64,${btoa(El.style + (this.css && El.zcss(this.css())) || '')}">`
+      `<link rel="stylesheet" href="data:text/css;base64,${btoa(El.style + (this.styles && this.styles(El.zcss)) || '')}">`
     El.morph(shadow, document.createRange().createContextualFragment(El.styles[this.tagName] + html))
     this._unstash()
     El._contextId = null
@@ -109,7 +110,7 @@ class El extends HTMLElement {
     if (!El._contextId) return true
     const contextId = El._contextId
     El.deps[path] = El.deps[path] || {}
-    return El.deps[path][El._contextId] = _ => El.els[contextId].$update()
+    return El.deps[path][El._contextId] = El.els[contextId].$update
   }
   static observable(x, path = Math.random().toString(36).slice(2)) {
     if ((typeof x != 'object' || x === null) && El.dep(path)) return x
@@ -151,9 +152,9 @@ class El extends HTMLElement {
   static async nextTick(f) {
     await new Promise(r => setTimeout(_ => requestAnimationFrame(_ => { f && f(); r() })))
   }
-  static zcss(src) {
+  static zcss(...args) {
     let lines = [], stack = [], open, opened, close
-    src = src.replace(/,\n/gs, ',')
+    const src = args.join('').replace(/,\n/gs, ',')
     for (let line of src.split(/\n/)) {
       line = line.replace(/(.+,.+){/, ":is($1){")
       if (line.match(/^\s*@[msdk].*\{/))
@@ -173,5 +174,3 @@ class El extends HTMLElement {
     return v instanceof El.Raw ? v : v === 0 ? v : String(v || '').replace(/[<>'"]/g, c => `&#${c.charCodeAt(0)}`)
   }
 }
-
-export default El;

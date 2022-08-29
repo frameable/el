@@ -68,7 +68,7 @@
 
 <script type="module">
 
-  import El from './index.js';
+  import { El } from './debug.js';
 
   const store = El.observable({
     items: [
@@ -114,8 +114,8 @@
         </span>
       `
     }
-    css() {
-      return `
+    styles(css) {
+      return css`
         :host {
           display: table-row;
           &(:hover) {
@@ -199,8 +199,8 @@
         </div>
       `
     }
-    css() {
-      return `
+    styles(css) {
+      return css`
         .items-container {
           display: table;
           margin-top: 16px;
@@ -220,8 +220,8 @@
     }
   }
 
-  customElements.define('todo-item', TodoItem);
-  customElements.define('todo-items', TodoItems);
+  customElements.define('todo-item', TodoItem)
+  customElements.define('todo-items', TodoItems)
 
   function key() {
     return Math.random().toString(36).slice(2,8)

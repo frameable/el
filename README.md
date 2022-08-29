@@ -1,6 +1,6 @@
 # El
 
-Minimal JavaScript application framework inspired by React and Vue.  See a working todo list [example](https://dchester.github.io/el/example.html) and [source](https://github.com/dchester/el/blob/main/example.html)
+Minimal JavaScript application framework inspired by React, Vue, and lit-element. See a working todo list [example](https://frameable.github.io/el/example.html) and [source](https://github.com/frameable/el/blob/main/example.html)
 
 
 ### Introduction
@@ -41,10 +41,27 @@ El is based on [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web
 </script>
 ```
 
+## Installation
+
+El consists of a single source JavaScript file, [`el.js`](https://raw.githubusercontent.com/frameable/el/main/el.js). You can drop it into your project directly, and import:
+
+```
+<script type="module">
+  import { El } from './el.js'
+  /* ... */
+</script>
+```
+
+Or else your build system and install from the npm registry:
+
+```
+npm install @frameable/el
+```
+
 
 ## Components
 
-El serves as a base class for custom elements / WebComponents.  Inherit from `El` and then register with `customElements.define`:
+El serves as a base class for custom elements / Web Components.  Inherit from `El` and then register with `customElements.define`:
 
 ```html
 <my-element></my-element>
@@ -59,9 +76,9 @@ El serves as a base class for custom elements / WebComponents.  Inherit from `El
 
 If you are new to custom elements, some tips per the spec:
 
-- element tag names must be lowercase with at least one hyphen
+- Element tag names must be lowercase with at least one hyphen
 - `customElements.define` takes the given class and registers with the tag name
-- in the markup, custom elements cannot be self-closing
+- In the markup, custom elements cannot be self-closing
 
 #### Lifecycle methods
 
@@ -228,12 +245,12 @@ class TodoItemDescription extends El {
 
 ## Style
 
-Specify CSS via the `css` method. Styles are scoped so that they only apply to elements in this component.  Neither ancestors nor descendants of this component will be affected by these styles. The built-in preprocessor adds support for implicit nesting and ampersand selectors.
+Specify CSS via the `styles` method and `css` tag function. Styles are scoped so that they only apply to elements in this component.  Neither ancestors nor descendants of this component will be affected by these styles. The built-in preprocessor adds support for implicit nesting and ampersand selectors.
 
 ```javascript
 class TodoItem extends El {
-  css() {
-    return `
+  styles(css) {
+    return css`
       .item {
         margin: 16px;
         padding: 16px;
@@ -262,6 +279,18 @@ class TodoItem extends El {
 
 > The shadow DOM provides scoped CSS so that styles defined within a component don't leak either up to parents or down to children.  By default, global styles will also not be applied within components, which is great when you're building abstract components to be used across projects, but a hinderance when you want different components within a single application to have consistent fonts, colors, spacing, etc.  El clones global styles and applies those styles to each component via `link` tag with a data URI, so components will be affected by application-wide stylesheets.
 
-> El runs a stack-based line-by-line source filter on CSS in order to implement nesting CSS and the ampersand selector, popularized by SCSS and other tools, now a W3C working draft [CSS Nesting](https://www.w3.org/TR/css-nesting-1/).
+> El runs a stack-based line-by-line [zcss](https://github.com/dchester/zcss.js) source filter on CSS in order to implement nesting CSS and the ampersand selector, popularized by SCSS and other tools, now a W3C working draft [CSS Nesting](https://www.w3.org/TR/css-nesting-1/).
 
+
+## Resources
+
+##### MDN on Web Components
+https://developer.mozilla.org/en-US/docs/Web/Web_Components
+
+##### Syntax highlighting
+https://github.com/jonsmithers/vim-html-template-literals (Vim) \
+https://github.com/0x00000001A/es6-string-html (VS Code)
+
+##### zcss preprocessor
+https://github.com/dchester/zcss.js
 

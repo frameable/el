@@ -18,7 +18,7 @@ function setup() {
 
 setup();
 
-const { default: ElBase } = await import('../index.js')
+const { El: ElBase } = await import('../el.js')
 
 class El extends ElBase {
   _update(...args) {
@@ -394,8 +394,8 @@ suite('main', async test => {
       render(html) {
         return `<ul><li>Hello, World!</li></ul>`
       }
-      css() {
-        return `
+      styles(css) {
+        return css`
           ul {
             li {
               color: red;
