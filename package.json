@@ -1,7 +1,7 @@
 {
   "name": "el",
   "description": "Minimal JavaScript application framework",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "main": "./el.js",
   "type": "module",
   "scripts": {
