@@ -132,7 +132,7 @@ class TodoItem extends El {
         ${this.title}
       </div>
       <button onclick=${this.edit}>Edit</button>
-    `;
+    `
   }
 }
 ```
@@ -152,7 +152,7 @@ class TodoItems extends El {
           <todo-item item=${item} key=${item.id}></todo-item>
         `}
       </div>
-    `;
+    `
   }
 }
 ```
@@ -172,7 +172,7 @@ class TodoItem extends El {
         ? html`<button onclick=${this.edit}>Edit</button>`
         : html`<span>Archived</span>
       `}
-    `;
+    `
   }
 }
 ```
@@ -192,7 +192,7 @@ class TodoItemDescription extends El {
     return html`
       <input ref="descriptionInput">
       <button onclick=${this.save}>Save</button>`
-    `;
+    `
   }
 }
 ```
@@ -221,7 +221,7 @@ class TodoItem extends El {
           <li>${d.title}</li>
         `)}
       </ul>
-    `;
+    `
   }
 }
 ```
@@ -237,7 +237,7 @@ class TodoItemDescription extends El {
       <div class="description">
         ${html.raw(this.sanitizedDescriptionHTML)}
       </div>
-    `;
+    `
   }
 }
 ```
