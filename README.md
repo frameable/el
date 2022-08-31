@@ -284,10 +284,13 @@ class TodoItem extends El {
 
 ## Resources
 
+El Starter app template \
+https://github.com/frameable/el-starter
+
 MDN on Web Components \
 https://developer.mozilla.org/en-US/docs/Web/Web_Components
 
-Syntax highlighting \
+Editor syntax highlighting \
 https://github.com/jonsmithers/vim-html-template-literals (Vim) \
 https://github.com/0x00000001A/es6-string-html (VS Code)
 
