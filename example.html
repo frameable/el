@@ -165,6 +165,7 @@
   class TodoItems extends El {
     addItem() {
       const title = window.prompt("Enter title");
+      if (title === null) return
       store.items.push({
         id: key(),
         title
