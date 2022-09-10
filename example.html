@@ -68,7 +68,7 @@
 
 <script type="module">
 
-  import { El } from './el.js';
+  import { El } from './el.js'
 
   const store = El.observable({
     items: [
@@ -76,19 +76,19 @@
       { id: key(), title: "buy bread" },
       { id: key(), title: "buy eggs" },
     ],
-  });
+  })
 
   class TodoItem extends El {
     editItem() {
-      const title = window.prompt("Enter title", this.item.title);
-      if (title !== null) this.item.title = title;
+      const title = window.prompt("Enter title", this.item.title)
+      if (title !== null) this.item.title = title
     }
     toggleDone() {
-      this.item.done = !this.item.done;
+      this.item.done = !this.item.done
     }
     deleteItem() {
-      const index = store.items.findIndex(i => i.id == this.item.id);
-      store.items.splice(index, 1);
+      const index = store.items.findIndex(i => i.id == this.item.id)
+      store.items.splice(index, 1)
     }
     render(html) {
       return html`
@@ -164,21 +164,21 @@
 
   class TodoItems extends El {
     addItem() {
-      const title = window.prompt("Enter title");
+      const title = window.prompt("Enter title")
       if (title === null) return
       store.items.push({
         id: key(),
-        title
-      });
+        title,
+      })
     }
     toggleHideCompleted(e) {
-      store.hideCompleted = e.target.checked;
+      store.hideCompleted = e.target.checked
     }
     filteredItems() {
-      return store.items.filter(i => store.hideCompleted ? !i.done : true);
+      return store.items.filter(i => store.hideCompleted ? !i.done : true)
     }
     render(html) {
-      const items = this.filteredItems();
+      const items = this.filteredItems()
       return html`
         <div class="items-container">
           <header class="flex items-center">
@@ -217,7 +217,7 @@
             margin-left: auto;
           }
         }
-      `;
+      `
     }
   }
 
