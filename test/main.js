@@ -5,7 +5,7 @@ import { parseHTML } from 'linkedom'
 let debug = { updates: [] };
 
 function setup() {
-  const { document, HTMLElement, customElements } = parseHTML(`<html><body></body></html>`)
+  const { document, HTMLElement, HTMLInputElement, customElements } = parseHTML(`<html><body></body></html>`)
   global.customElements = customElements
   global.document = document
   global.HTMLElement = HTMLElement
@@ -13,7 +13,8 @@ function setup() {
   global.atob = str => Buffer.from(str, 'base64').toString()
   global.requestAnimationFrame = f => setTimeout(f, 16)
   try { ElBase.tags = {} } catch {}
-  debug.updates = [];
+  debug.updates = []
+  HTMLInputElement.prototype.checked = false
 }
 
 setup();
@@ -386,7 +387,34 @@ suite('main', async test => {
     assert.equal(warnings.length, 1, "we logged when we didn't have keys")
     console.warn = _warn;
 
-  });
+  })
+
+  await test('checkbox', async () => {
+    setup();
+
+    class FormEl extends El {
+      created() {
+        this.state = El.observable({ checked: false })
+      }
+      render(html) {
+        return html`
+          <form>
+            <input type="checkbox" ${this.state.checked && 'checked'}>
+          </form>
+        `
+      }
+    }
+    customElements.define('form-el', FormEl)
+    const formEl = document.createElement('form-el')
+    document.body.appendChild(formEl)
+    const input = formEl.shadowRoot.querySelector('input')
+    assert.equal(input.hasAttribute('checked'), false, "checkbox has no checked attr")
+    assert.equal(input.checked, false, "checked property not set")
+    formEl.state.checked = true
+    await formEl.$nextTick()
+    assert.equal(input.hasAttribute('checked'), true, "checked attribute present")
+    assert.equal(input.checked, true, "checked property is set")
+  })
 
   await test('css', async () => {
     setup();

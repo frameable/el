@@ -136,10 +136,14 @@ export class El extends HTMLElement {
     for (const a of r.attributes || [])
       if (l.getAttribute(a.name) != a.value) {
         l.setAttribute(a.name, a.value)
-        l.$update && l.$update();
+        if (l.constructor.prototype.hasOwnProperty(a.name) && typeof l[a.name] == 'boolean') l[a.name] = true
+        l.$update && l.$update()
       }
     for (const a of l.attributes || [])
-      if (!r.hasAttribute(a.name)) l.removeAttribute(a.name)
+      if (!r.hasAttribute(a.name)) {
+        l.removeAttribute(a.name)
+        if (l.constructor.prototype.hasOwnProperty(a.name) && typeof l[a.name] == 'boolean') l[a.name] = false
+      }
 
     while (ls < le || rs < re)
       if (ls == le) l.insertBefore(lc.find(l => key(l) == key(rc[rs])) || rc[rs], lc[ls]) && rs++
