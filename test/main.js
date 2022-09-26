@@ -438,5 +438,26 @@ suite('main', async test => {
     const css = atob(cssEl.shadowRoot.querySelector('link').href.split(',')[1])
     assert.equal(css.replace(/\s+/g, ' '), 'ul li{ color: red; }')
   })
+
+  await test('watch mounted', async () => {
+    setup();
+    let watched = false;
+    class MyComponent extends El {
+      mounted() {
+        this.state = El.observable({ item: false })
+        this.$watch(this.state.item, () => {
+          watched = true;
+        });
+        this.state.item = true;
+     }
+    }
+    customElements.define('my-component', MyComponent)
+    const component = document.createElement('my-component')
+    assert.equal(watched, false, 'watched starts false')
+    document.body.appendChild(component)
+    await new Promise(r => setTimeout(r))
+    assert.equal(watched, true, 'watched becomes true')
+    component.remove()
+  })
 })
 

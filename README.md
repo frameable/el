@@ -112,7 +112,7 @@ A component can also subscribe to changes with `$watch`.
 
 ```javascript
 class TodoItems extends El {
-  created() {
+  mounted() {
     this.$watch(store.items.length, () => console.log("length changed!"));
   }
 }
