@@ -439,7 +439,7 @@ suite('main', async test => {
     assert.equal(css.replace(/\s+/g, ' '), 'ul li{ color: red; }')
   })
 
-  await test('watch-mounted', async () => {
+  await test('watch mounted', async () => {
     setup();
     let watched = false;
     class MyComponent extends El {
