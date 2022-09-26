@@ -459,26 +459,5 @@ suite('main', async test => {
     assert.equal(watched, true, 'watched becomes true')
     component.remove()
   })
-
-  await test('watch-created', async () => {
-    setup();
-    let watched = false;
-    class MyComponent extends El {
-      created() {
-        this.state = El.observable({ item: false })
-        this.$watch(this.state.item, () => {
-          watched = true;
-        });
-        this.state.item = true;
-     }
-    }
-    customElements.define('my-component', MyComponent)
-    const component = document.createElement('my-component')
-    assert.equal(watched, false, 'watched starts false')
-    document.body.appendChild(component)
-    await new Promise(r => setTimeout(r))
-    assert.equal(watched, true, 'watched becomes true')
-    component.remove()
-  })
 })
 
