@@ -78,8 +78,8 @@ export class El extends HTMLElement {
   $observable() {
     return El.observable(...arguments);
   }
-  async $nextTick() {
-    return await El.nextTick();
+  $nextTick() {
+    return El.nextTick();
   }
   $html(strings, ...vals) {
     for (const [i] of strings.entries()) {
@@ -153,8 +153,8 @@ export class El extends HTMLElement {
       else if (lc[ls] && rc[rs].children && lc[ls].tagName == rc[rs].tagName) El.morph(lc[ls++], rc[rs++])
       else lc[ls++].replaceWith(rc[rs++])
   }
-  static async nextTick(f) {
-    await new Promise(r => setTimeout(_ => requestAnimationFrame(_ => { f && f(); r() })))
+  static nextTick(f) {
+    return new Promise(r => setTimeout(_ => requestAnimationFrame(_ => { f && f(); r() })))
   }
   static zcss(...args) {
     let lines = [], stack = [], open, opened, close
