@@ -1,7 +1,7 @@
 {
   "name": "@frameable/el",
   "description": "Minimal JavaScript application framework",
-  "version": "0.7.3",
+  "version": "0.7.5",
   "main": "./el.js",
   "type": "module",
   "scripts": {
