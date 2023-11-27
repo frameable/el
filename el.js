@@ -175,6 +175,6 @@ export class El extends HTMLElement {
     return close && lines.push('}') && lines.join('\n')
   }
   static escape(v) {
-    return v instanceof El.Raw ? v : v === 0 ? v : String(v || '').replace(/[<>'"]/g, c => `&#${c.charCodeAt(0)}`)
+    return v instanceof El.Raw ? v : v === 0 ? v : String(v || '').replace(/[<>'"]/g, c => `&#${c.charCodeAt(0)};`)
   }
 }
