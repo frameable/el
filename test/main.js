@@ -342,6 +342,24 @@ suite('main', async test => {
     assert.equal(adjEl.$refs.toggle.innerHTML.trim(), '<b>OFF</b>');
   });
 
+  await test('escape json', async () => {
+
+    setup();
+    class TitleEl extends El {
+      title = '{"id":"93b71d"}';
+      render(html) {
+        return html`
+          <h1 ref="esc">${this.title}</h1>
+        `;
+      }
+    }
+
+    customElements.define('title-el', TitleEl)
+    const titleEl = document.createElement('title-el')
+    document.body.appendChild(titleEl)
+    assert.equal(titleEl.$refs.esc.innerHTML.trim(), '{"id":"93b71d"}')
+  });
+
   await test('escape html', async () => {
 
     setup();
